@@ -145,6 +145,17 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
                 return damage + addedDamage * ServerConfig.BOOTS_ARMOR_DAMAGE.get().floatValue();
             }
         }
+        ServerVivePlayer vivePlayer = vivecraft$getVivePlayer();
+        if (vivePlayer != null && vivePlayer.isVR() &&
+            vivePlayer.getActiveItemBodyPart().isHand() &&
+            this.getMainHandItem().isEmpty())
+        {
+            float worldScale = Math.max(1.0F, vivePlayer.worldScale);
+            float giantStrengthMultiplier = 1.0F + (worldScale - 1.0F) * 0.75F;
+
+            return damage * giantStrengthMultiplier;
+        }
+
         return damage;
     }
 
