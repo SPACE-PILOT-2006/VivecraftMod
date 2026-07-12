@@ -18,6 +18,8 @@ public class GuiMainVRSettings extends GuiVROptionsBase {
         new VROptionLayout(GuiOtherHUDSettings.class, VROptionLayout.Position.POS_RIGHT, 2.0F, true,
             "vivecraft.options.screen.guiother.button"),
         new VROptionLayout(VRSettings.VrOptions.WORLD_SCALE, VROptionLayout.Position.POS_LEFT, 6.0F, true, null),
+        new VROptionLayout(GuiSuperStrengthSettings.class, VROptionLayout.Position.POS_LEFT, 7.0F, true,
+            "Super Strength Options"),
         new VROptionLayout(VRSettings.VrOptions.WORLD_ROTATION, VROptionLayout.Position.POS_RIGHT, 6.0F, true, null),
         new VROptionLayout(VRSettings.VrOptions.PLAY_MODE_SEATED, (button, mousePos) -> {
             this.reinit = true;

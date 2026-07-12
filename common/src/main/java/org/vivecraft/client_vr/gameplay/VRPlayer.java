@@ -862,7 +862,11 @@ public class VRPlayer {
                 } else {
                     direction = direction.scale(this.dh.vrSettings.movementSpeedMultiplier);
                 }
-
+                // Scale movement speed for giant world scales
+                if (this.worldScale > 1.0F) {
+                    float giantMovementMultiplier = 1.0F + (Math.min(this.worldScale, 4.0F) - 1.0F) * 0.08F;
+                    direction = direction.scale(giantMovementMultiplier);
+                }
                 mX = direction.x;
                 mY = direction.y;
                 mZ = direction.z;

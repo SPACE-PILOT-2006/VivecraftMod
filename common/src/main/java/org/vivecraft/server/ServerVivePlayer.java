@@ -53,7 +53,8 @@ public class ServerVivePlayer {
     public UpdateChecker.Version version = UpdateChecker.Version.UNKNOWN;
     // if the client requested damage direction data
     public boolean wantsDamageDirection = false;
-
+    public boolean superStrength = false;
+    public boolean superStrengthWeapons = false;
     public ServerVivePlayer(ServerPlayer player) {
         this.player = player;
     }

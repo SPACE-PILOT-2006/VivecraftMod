@@ -104,6 +104,8 @@
   "vivecraft.options.screen.freemove.button": "Free Move Settings...",
   "vivecraft.options.screen.keyboard.button": "Keyboard Settings...",
   "_comment5": "Option names",
+  "vivecraft.options.SUPER_STRENGTH": "Super Strength",
+  "vivecraft.options.SUPER_STRENGTH_WEAPONS": "Super Strength Weapons",
   "vivecraft.options.HUD_SCALE": "Head HUD Size",
   "vivecraft.options.HUD_DISTANCE": "Head HUD Distance",
   "vivecraft.options.HUD_LOCK_TO": "HUD Orientation Lock",

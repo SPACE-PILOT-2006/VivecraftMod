@@ -1,5 +1,7 @@
 package org.vivecraft.mixin.server;
-
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.TridentItem;
+import org.vivecraft.data.ViveItemTags;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -94,7 +96,7 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
     }
 
     /**
-     * inject into {@link Player#doSweepAttack}
+     * inject into Player#doSweepAttack
      */
     @Override
     protected int vivecraft$modifySweepParticleSpawnPos(
@@ -147,18 +149,34 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
         }
         ServerVivePlayer vivePlayer = vivecraft$getVivePlayer();
         if (vivePlayer != null && vivePlayer.isVR() &&
-            vivePlayer.getActiveItemBodyPart().isHand() &&
-            this.getMainHandItem().isEmpty())
+            vivePlayer.getActiveItemBodyPart().isHand())
         {
-            float worldScale = Math.max(1.0F, vivePlayer.worldScale);
-            float giantStrengthMultiplier = 1.0F + (worldScale - 1.0F) * 0.75F;
+            ItemStack strikingItem =
+                vivePlayer.getActiveItemBodyPart() == VRBodyPart.OFF_HAND ?
+                    this.getItemBySlot(EquipmentSlot.OFFHAND) :
+                    this.getMainHandItem();
 
-            return damage * giantStrengthMultiplier;
+            boolean isWeapon =
+                strikingItem.is(ItemTags.SWORDS) ||
+                    strikingItem.is(ItemTags.AXES) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_SWORDS) ||
+                    strikingItem.getItem() instanceof TridentItem ||
+                    strikingItem.is(ItemTags.SPEARS) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_SPEARS) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_LANCES);
+
+            if ((!isWeapon && vivePlayer.superStrength) ||
+                (isWeapon && vivePlayer.superStrengthWeapons))
+            {
+                float worldScale = Math.max(1.0F, vivePlayer.worldScale);
+                float giantStrengthMultiplier = 1.0F + (worldScale - 1.0F) * 0.75F;
+
+                return damage * giantStrengthMultiplier;
+            }
         }
 
         return damage;
     }
-
     @Unique
     private ItemStack vivecraft$roomscaleShieldItem;
 

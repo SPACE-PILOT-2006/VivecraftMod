@@ -204,6 +204,11 @@ public class ServerNetworking {
                 }
             }
             case DRAW -> vivePlayer.draw = ((DrawPayloadC2S) c2sPayload).draw();
+            case SUPER_STRENGTH ->
+                vivePlayer.superStrength = ((SuperStrengthPayloadC2S) c2sPayload).enabled();
+
+            case SUPER_STRENGTH_WEAPONS ->
+                vivePlayer.superStrengthWeapons = ((SuperStrengthWeaponsPayloadC2S) c2sPayload).enabled();
             case VR_PLAYER_STATE -> vivePlayer.setVrPlayerState(((VRPlayerStatePayloadC2S) c2sPayload).playerState());
             case WORLDSCALE -> vivePlayer.worldScale = ((WorldScalePayloadC2S) c2sPayload).worldScale();
             case HEIGHT -> vivePlayer.heightScale = ((HeightPayloadC2S) c2sPayload).heightScale();

@@ -55,6 +55,8 @@ public interface VivecraftPayloadC2S extends VivecraftPayload {
                 case AIM_DIRECTION_OVERRIDE -> AimDirOverridePayloadC2S.read(buffer);
                 case AIM_OVERRIDE_RESET -> AimOverrideResetPayloadC2S.read(buffer);
                 case AIM_POSITION_OVERRIDE -> AimPosOverridePayloadC2S.read(buffer);
+                case SUPER_STRENGTH -> SuperStrengthPayloadC2S.read(buffer);
+                case SUPER_STRENGTH_WEAPONS -> SuperStrengthWeaponsPayloadC2S.read(buffer);
                 default -> {
                     ServerNetworking.LOGGER.error("Vivecraft: Got unexpected payload identifier on server: {}", id);
                     yield UnknownPayloadC2S.read(buffer);

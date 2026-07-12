@@ -69,6 +69,8 @@ public class ClientNetworking {
     public static NetworkVersion USED_NETWORK_VERSION = NetworkVersion.LEGACY;
     private static float WORLDSCALE_LAST = 0.0F;
     private static float HEIGHT_LAST = 0.0F;
+    private static boolean SUPER_STRENGTH_LAST = false;
+    private static boolean SUPER_STRENGTH_WEAPONS_LAST = false;
 
     // these overrides are for vanilla servers
     public static Vector3fc AIM_DIR_OVERRIDE = null;
@@ -86,6 +88,8 @@ public class ClientNetworking {
     public static void resetServerSettings() {
         WORLDSCALE_LAST = 0.0F;
         HEIGHT_LAST = 0.0F;
+        SUPER_STRENGTH_LAST = false;
+        SUPER_STRENGTH_WEAPONS_LAST = false;
         SERVER_HAS_VIVECRAFT = false;
         SERVER_WANTS_DATA = false;
         SERVER_SUPPORTS_DIRECT_TELEPORT = false;
@@ -157,6 +161,21 @@ public class ClientNetworking {
             sendServerPacket(new WorldScalePayloadC2S(worldScale));
 
             WORLDSCALE_LAST = worldScale;
+        }
+
+        boolean superStrength = ClientDataHolderVR.getInstance().vrSettings.superStrength;
+
+        if (superStrength != SUPER_STRENGTH_LAST) {
+            sendServerPacket(new SuperStrengthPayloadC2S(superStrength));
+            SUPER_STRENGTH_LAST = superStrength;
+        }
+
+        boolean superStrengthWeapons =
+            ClientDataHolderVR.getInstance().vrSettings.superStrengthWeapons;
+
+        if (superStrengthWeapons != SUPER_STRENGTH_WEAPONS_LAST) {
+            sendServerPacket(new SuperStrengthWeaponsPayloadC2S(superStrengthWeapons));
+            SUPER_STRENGTH_WEAPONS_LAST = superStrengthWeapons;
         }
 
         float userHeight = AutoCalibration.getPlayerHeight();

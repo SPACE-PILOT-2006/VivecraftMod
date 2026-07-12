@@ -279,6 +279,11 @@ public class VRSettings {
     public AimDevice aimDevice = AimDevice.CONTROLLER;
     @SettingField(value = VrOptions.WORLD_SCALE)
     public float worldScale = 1.0f;
+    @SettingField(VrOptions.SUPER_STRENGTH)
+    public boolean superStrength = true;
+
+    @SettingField(VrOptions.SUPER_STRENGTH_WEAPONS)
+    public boolean superStrengthWeapons = false;
     @SettingField(value = VrOptions.WORLD_ROTATION)
     public float worldRotation = 0f;
     public float worldRotationCached;
@@ -2022,6 +2027,8 @@ public class VRSettings {
         },
         BCB_ON(OptionType.BOOLEAN), // Show Body Position
         FEET_BODY_POSITION(OptionType.BOOLEAN), // uses the average of the fbt feet trackers as body position
+        SUPER_STRENGTH(OptionType.BOOLEAN),
+        SUPER_STRENGTH_WEAPONS(OptionType.BOOLEAN),
         WORLD_SCALE(0, 29, 1, 2) { // World Scale
 
             @Override
