@@ -31,6 +31,7 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3fc;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -90,8 +91,9 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
     private void vivecraft$overridePose(CallbackInfo ci) {
         ServerVRPlayers.overridePose((ServerPlayer) (Object) this);
         ServerVivePlayer serverVivePlayer = vivecraft$getVivePlayer();
-        if (serverVivePlayer != null) {
+        if(serverVivePlayer != null) {
             serverVivePlayer.tick();
+            serverVivePlayer.updateSuperStrengthSwingDirection();
         }
     }
 
@@ -176,6 +178,61 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
         }
 
         return damage;
+    }
+
+    @Override
+    protected float vivecraft$knockbackModifier(float knockback) {
+        ServerVivePlayer vivePlayer = vivecraft$getVivePlayer();
+
+        if (vivePlayer != null && vivePlayer.isVR() &&
+            vivePlayer.getActiveItemBodyPart().isHand())
+        {
+            ItemStack strikingItem =
+                vivePlayer.getActiveItemBodyPart() == VRBodyPart.OFF_HAND ?
+                    this.getItemBySlot(EquipmentSlot.OFFHAND) :
+                    this.getMainHandItem();
+
+            boolean isWeapon =
+                strikingItem.is(ItemTags.SWORDS) ||
+                    strikingItem.is(ItemTags.AXES) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_SWORDS) ||
+                    strikingItem.getItem() instanceof TridentItem ||
+                    strikingItem.is(ItemTags.SPEARS) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_SPEARS) ||
+                    strikingItem.is(ViveItemTags.VIVECRAFT_LANCES);
+
+            if ((!isWeapon && vivePlayer.superStrength) ||
+                (isWeapon && vivePlayer.superStrengthWeapons))
+            {
+                float worldScale = Math.max(1.0F, vivePlayer.worldScale);
+                float giantKnockbackBonus = (worldScale - 1.0F) * 0.75F;
+
+                return knockback + giantKnockbackBonus;
+            }
+        }
+
+        return knockback;
+    }@Override
+    protected float vivecraft$knockbackYawModifier(float yaw) {
+        ServerVivePlayer vivePlayer = vivecraft$getVivePlayer();
+
+        if (vivePlayer != null &&
+            vivePlayer.isVR() &&
+            vivePlayer.superStrength) {
+
+            Vec3 swingDirection =
+                vivePlayer.getActiveItemBodyPart() == VRBodyPart.OFF_HAND
+                    ? vivePlayer.superStrengthOffHandSwingDirection
+                    : vivePlayer.superStrengthMainHandSwingDirection;
+
+            if (swingDirection != null) {
+                return (float) Math.toDegrees(
+                    Math.atan2(-swingDirection.x, swingDirection.z)
+                );
+            }
+        }
+
+        return yaw;
     }
     @Unique
     private ItemStack vivecraft$roomscaleShieldItem;

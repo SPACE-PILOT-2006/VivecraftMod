@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemCooldowns;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,5 +53,34 @@ public abstract class PlayerMixin extends LivingEntityMixin {
     @ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtOrSimulate(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     protected float vivecraft$damageModifier(float damage) {
         return damage;
+    }
+
+    /**
+     * dummy to be overridden in {@link ServerPlayerMixin}
+     */
+    @ModifyArg(
+        method = "attack",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/player/Player;causeExtraKnockback(Lnet/minecraft/world/entity/Entity;FLnet/minecraft/world/phys/Vec3;)V"
+        ),
+        index = 1
+    )
+    protected float vivecraft$knockbackModifier(float knockback) {
+        return knockback;
+    }
+
+    /**
+     * dummy to be overridden in {@link ServerPlayerMixin}
+     */
+    @ModifyExpressionValue(
+        method = "causeExtraKnockback",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/player/Player;getYRot()F"
+        )
+    )
+    protected float vivecraft$knockbackYawModifier(float yaw) {
+        return yaw;
     }
 }

@@ -43,6 +43,16 @@ public class ServerVivePlayer {
     // if the player has VR active
     private boolean isVR = false;
     // offset set during aimFix to keep the original data positions
+    public boolean wantsDamageDirection = false;
+    public boolean superStrength = false;
+    public boolean superStrengthWeapons = false;
+
+    public Vec3 previousSuperStrengthHandPos = null;
+    public Vec3 superStrengthSwingDirection = null;
+    public Vec3 previousSuperStrengthMainHandPos = null;
+    public Vec3 previousSuperStrengthOffHandPos = null;
+    public Vec3 superStrengthMainHandSwingDirection = null;
+    public Vec3 superStrengthOffHandSwingDirection = null;
     public Vec3 offset = Vec3.ZERO;
     // player this data belongs to
     public ServerPlayer player;
@@ -52,9 +62,7 @@ public class ServerVivePlayer {
     // version the player sent on join
     public UpdateChecker.Version version = UpdateChecker.Version.UNKNOWN;
     // if the client requested damage direction data
-    public boolean wantsDamageDirection = false;
-    public boolean superStrength = false;
-    public boolean superStrengthWeapons = false;
+
     public ServerVivePlayer(ServerPlayer player) {
         this.player = player;
     }
@@ -202,6 +210,37 @@ public class ServerVivePlayer {
      */
     public Vec3 getBodyPartPos(VRBodyPart bodyPart) {
         return getBodyPartPos(bodyPart, false);
+    }
+    public void updateSuperStrengthSwingDirection() {
+        if (!this.isVR() || !this.superStrength) {
+            this.previousSuperStrengthMainHandPos = null;
+            this.previousSuperStrengthOffHandPos = null;
+            this.superStrengthMainHandSwingDirection = null;
+            this.superStrengthOffHandSwingDirection = null;
+            return;
+        }
+
+        Vec3 currentMainHandPos = this.getBodyPartPos(VRBodyPart.MAIN_HAND);
+        Vec3 currentOffHandPos = this.getBodyPartPos(VRBodyPart.OFF_HAND);
+
+        if (this.previousSuperStrengthMainHandPos != null) {
+            Vec3 movement = currentMainHandPos.subtract(this.previousSuperStrengthMainHandPos);
+
+            if (movement.lengthSqr() > 0.0001D) {
+                this.superStrengthMainHandSwingDirection = movement.normalize();
+            }
+        }
+
+        if (this.previousSuperStrengthOffHandPos != null) {
+            Vec3 movement = currentOffHandPos.subtract(this.previousSuperStrengthOffHandPos);
+
+            if (movement.lengthSqr() > 0.0001D) {
+                this.superStrengthOffHandSwingDirection = movement.normalize();
+            }
+        }
+
+        this.previousSuperStrengthMainHandPos = currentMainHandPos;
+        this.previousSuperStrengthOffHandPos = currentOffHandPos;
     }
 
     /**
