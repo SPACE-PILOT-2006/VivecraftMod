@@ -53,6 +53,7 @@ public class ServerVivePlayer {
     public Vec3 previousSuperStrengthOffHandPos = null;
     public Vec3 superStrengthMainHandSwingDirection = null;
     public Vec3 superStrengthOffHandSwingDirection = null;
+    public Vec3 previousSuperStrengthPlayerPos = null;
     public Vec3 offset = Vec3.ZERO;
     // player this data belongs to
     public ServerPlayer player;
@@ -215,6 +216,7 @@ public class ServerVivePlayer {
         if (!this.isVR() || !this.superStrength) {
             this.previousSuperStrengthMainHandPos = null;
             this.previousSuperStrengthOffHandPos = null;
+            this.previousSuperStrengthPlayerPos = null;
             this.superStrengthMainHandSwingDirection = null;
             this.superStrengthOffHandSwingDirection = null;
             return;
@@ -222,25 +224,50 @@ public class ServerVivePlayer {
 
         Vec3 currentMainHandPos = this.getBodyPartPos(VRBodyPart.MAIN_HAND);
         Vec3 currentOffHandPos = this.getBodyPartPos(VRBodyPart.OFF_HAND);
+        Vec3 currentPlayerPos = this.player.position();
 
-        if (this.previousSuperStrengthMainHandPos != null) {
-            Vec3 movement = currentMainHandPos.subtract(this.previousSuperStrengthMainHandPos);
+        if (this.previousSuperStrengthPlayerPos != null) {
+            Vec3 playerMovement =
+                currentPlayerPos.subtract(this.previousSuperStrengthPlayerPos);
 
-            if (movement.lengthSqr() > 0.0001D) {
-                this.superStrengthMainHandSwingDirection = movement.normalize();
+            if (this.previousSuperStrengthMainHandPos != null) {
+                Vec3 handMovement =
+                    currentMainHandPos.subtract(this.previousSuperStrengthMainHandPos);
+
+                Vec3 movement = handMovement.subtract(playerMovement);
+
+                double horizontalMovementSqr =
+                    movement.x * movement.x + movement.z * movement.z;
+
+                if (horizontalMovementSqr > 0.0025D) {
+                    this.superStrengthMainHandSwingDirection =
+                        new Vec3(movement.x, 0.0D, movement.z).normalize();
+                } else {
+                    this.superStrengthMainHandSwingDirection = null;
+                }
             }
-        }
 
-        if (this.previousSuperStrengthOffHandPos != null) {
-            Vec3 movement = currentOffHandPos.subtract(this.previousSuperStrengthOffHandPos);
+            if (this.previousSuperStrengthOffHandPos != null) {
+                Vec3 handMovement =
+                    currentOffHandPos.subtract(this.previousSuperStrengthOffHandPos);
 
-            if (movement.lengthSqr() > 0.0001D) {
-                this.superStrengthOffHandSwingDirection = movement.normalize();
+                Vec3 movement = handMovement.subtract(playerMovement);
+
+                double horizontalMovementSqr =
+                    movement.x * movement.x + movement.z * movement.z;
+
+                if (horizontalMovementSqr > 0.0025D) {
+                    this.superStrengthOffHandSwingDirection =
+                        new Vec3(movement.x, 0.0D, movement.z).normalize();
+                } else {
+                    this.superStrengthOffHandSwingDirection = null;
+                }
             }
         }
 
         this.previousSuperStrengthMainHandPos = currentMainHandPos;
         this.previousSuperStrengthOffHandPos = currentOffHandPos;
+        this.previousSuperStrengthPlayerPos = currentPlayerPos;
     }
 
     /**
