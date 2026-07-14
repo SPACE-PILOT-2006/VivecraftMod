@@ -117,6 +117,7 @@
     "server.level.ServerPlayerGameModeMixin",
     "server.players.PlayerListMixin",
     "world.entity.InventoryMixin",
+    "world.entity.EntityMixin",
     "world.entity.LivingEntityMixin",
     "world.entity.MobMixin",
     "world.entity.PlayerMixin",
