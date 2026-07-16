@@ -119,6 +119,7 @@
     "world.entity.InventoryMixin",
     "world.entity.EntityMixin",
     "world.entity.LivingEntityMixin",
+    "world.entity.AttackRangeMixin",
     "world.entity.MobMixin",
     "world.entity.PlayerMixin",
     "world.entity.ai.goal.SwellGoalMixin",
