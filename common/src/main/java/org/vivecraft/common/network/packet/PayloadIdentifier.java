@@ -15,6 +15,7 @@ public enum PayloadIdentifier {
     SETTING_OVERRIDE,
     HEIGHT,
     ACTIVEHAND,
+    ATTACK_HAND,
     CRAWL,
     NETWORK_VERSION,
     VR_SWITCHING,

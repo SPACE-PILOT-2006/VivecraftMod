@@ -37,11 +37,12 @@ import org.vivecraft.mod_compat_vr.ReplayHelper;
 import org.vivecraft.server.config.ConfigBuilder;
 import org.vivecraft.server.config.ServerConfig;
 import org.vivecraft.server.config.enums.ClimbeyBlockmode;
-
+import net.minecraft.world.InteractionHand;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import net.minecraft.world.entity.Entity;
 
 public class ServerNetworking {
 
@@ -212,12 +213,10 @@ public class ServerNetworking {
             case SUPER_STRENGTH_WEAPONS ->
                 vivePlayer.superStrengthWeapons = ((SuperStrengthWeaponsPayloadC2S) c2sPayload).enabled();
             case VR_PLAYER_STATE -> vivePlayer.setVrPlayerState(((VRPlayerStatePayloadC2S) c2sPayload).playerState());
+
             case WORLDSCALE -> {
                 vivePlayer.worldScale = ((WorldScalePayloadC2S) c2sPayload).worldScale();
-
-                if (vivePlayer.isVR() && vivePlayer.superStrength) {
-                    player.refreshDimensions();
-                }
+                player.refreshDimensions();
             }
             case HEIGHT -> vivePlayer.heightScale = ((HeightPayloadC2S) c2sPayload).heightScale();
             case TELEPORT -> {
@@ -330,15 +329,31 @@ public class ServerNetworking {
                     LEGACY_DATA_MAP.remove(player.getUUID());
                 }
             }
+
+            case ATTACK_HAND -> {
+                AttackHandPayloadC2S attack = (AttackHandPayloadC2S) c2sPayload;
+                InteractionHand hand = attack.hand();
+                int entityId = attack.entityId();
+                Entity entity = player.level().getEntity(entityId);
+
+                if (entity == null) break;
+
+                player.attack(entity);
+                player.swing(hand, true);
+                LOGGER.info("Received ATTACK_HAND packet");
+                LOGGER.info("Attacked entity {} with {}", entityId, hand);
+                break;
+            }
+
             default -> throw new IllegalStateException(
                 "Vivecraft: got unexpected packet on server: " + c2sPayload.payloadId());
         }
     }
 
     /**
-     * attribute modification, based on vanilla code: {@link net.minecraft.world.entity.LivingEntity#collectEquipmentChanges}
+     * Attribute modification based on vanilla's collectEquipmentChanges method.
      *
-     * @param player  player to modify attributes for
+     * @param player player to modify attributes for
      * @param oldItem old item to remove the attributes for
      * @param newItem new item to add the attributes for
      */

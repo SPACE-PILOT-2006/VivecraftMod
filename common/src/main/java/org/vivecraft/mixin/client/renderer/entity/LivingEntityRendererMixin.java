@@ -9,6 +9,9 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,6 +40,9 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
         CallbackInfo ci, @Local(argsOnly = true) LivingEntityRenderState renderState,
         @Local(argsOnly = true) PoseStack poseStack)
     {
+        if (Minecraft.getInstance().screen instanceof InventoryScreen) {
+            return;
+        }
         // PoseStack is already pushed before this
         // need to do this here, because doing it in the VRPlayerRenderer doesn't work,
         // because forge/neoforge override the render method, and arch can't link that correctly
@@ -59,4 +65,35 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
             poseStack.scale(scale, scale, scale);
         }
     }
-}
+
+        @Inject(method = "extractRenderState", at = @At("TAIL"))
+        private void vivecraft$scaleNameTagAttachment (
+        T entity,
+        S renderState,
+        float partialTick,
+        CallbackInfo ci
+){
+        if (renderState.nameTagAttachment == null) {
+            return;
+        }
+
+        ClientVRPlayers.RotInfo rotInfo =
+            ((EntityRenderStateExtension) renderState).vivecraft$getRotInfo();
+
+        if (rotInfo == null) {
+            return;
+        }
+
+        float scale = rotInfo.heightScale;
+
+        if (((EntityRenderStateExtension) renderState).vivecraft$isFirstPersonPlayer()
+            || ClientDataHolderVR.getInstance().vrSettings.applyPlayerWorldscale)
+        {
+            scale *= rotInfo.worldScale
+                / ((EntityRenderStateExtension) renderState).vivecraft$getTotalScale();
+        }
+
+        Vec3 attachment = renderState.nameTagAttachment;
+        renderState.nameTagAttachment = attachment.scale(scale);
+    }
+    }

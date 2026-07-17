@@ -368,6 +368,12 @@ public class SwingTracker implements ItemInUseTracker, DebugRenderTracker {
                             } else if (!EpicFightHelper.isLoaded() || !EpicFightHelper.attack()) {
                                 ClientNetworking.sendActiveBodyPart(BODYPARTS[i], true);
                                 // only attack if epic fight didn't trigger
+                                System.out.println("ATTACK CALLED");
+                                ClientNetworking.sendAttackHand(
+                                    entity.getId(),
+                                    isHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND
+                                );
+
                                 this.mc.gameMode.attack(player, entity);
                             } else {
                                 // only attack once with epic fight

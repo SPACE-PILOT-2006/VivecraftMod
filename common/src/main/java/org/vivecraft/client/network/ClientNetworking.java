@@ -560,8 +560,11 @@ public class ClientNetworking {
             }
             case DAMAGE_DIRECTION ->
                 dataholder.hapticTracker.setLastHitDirection(((DamageDirectionPayloadS2C) s2cPayload).damageDir());
-            case ATTACK_WHILE_BLOCKING ->
-                SERVER_ALLOWS_ATTACKING_WHILE_BLOCKING = ((AttackWhileBlockingPayloadS2C) s2cPayload).allowed();
+            case ATTACK_WHILE_BLOCKING -> SERVER_ALLOWS_ATTACKING_WHILE_BLOCKING =
+                ((AttackWhileBlockingPayloadS2C) s2cPayload).allowed();
         }
     }
-}
+        public static void sendAttackHand(int entityId, InteractionHand hand) {
+            sendServerPacket(new AttackHandPayloadC2S(entityId, hand));
+        }
+    }
